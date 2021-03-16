@@ -1,45 +1,53 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 import Nav from './Nav';
-import List from './List';
+import {
+	BrowserRouter as Router,
+	Switch,
+	Route,
+	RouteComponentProps
+} from "react-router-dom";
+import routes from './routes';
+
 
 const App = () => {
 
-	const [list, setList] = useState([
-		{ Id: Math.random(), Name: `ToDo ${Math.random()}` },
-		{ Id: Math.random(), Name: `ToDo ${Math.random()}` },
-		{ Id: Math.random(), Name: `ToDo ${Math.random()}` },
-	])
-
-	const addItem = () => {
-		const newList = list.concat({ Id: Math.random(), Name: `ToDo ${Math.random()}` })
-		setList(newList)
-		console.log('add', newList)
+	const someAction = (Id: number) => {
+		console.log('some action')
 	}
 
-	const deleteHandler = (Id: number) => {
-		const newList = list.filter((item: { Id: number }) => item.Id !== Id)
-		setList(newList)
-	}
-
-	useEffect(() => {
-		const fetchData = () => {
-			console.log('use effect maybe for fetch')
-			console.log('list', list)
-		}
-		fetchData()
-	}, [list])
+	// useEffect(() => {
+	// 	const fetchData = () => {
+	// 		console.log('use effect maybe for fetch')
+	// 		console.log('list', list)
+	// 	}
+	// 	fetchData()
+	// }, [list])
 
 	return (
-		<div className="App">
-			<Nav deleteHandler={ deleteHandler }/>
-			<h1>App</h1>
-			<p>
-				<button onClick={ addItem }>Push</button>
-			</p>
-			<List list={ list } deleteHandler={ deleteHandler } />
-			{/* <List list={ list.filter(el => el.Id > 1) }/> */}
-		</div>
+		<Router>
+			<div className="App">
+				<Nav deleteHandler={someAction} />
+				<h1>App</h1>
+				<Switch>
+					{routes.map((route: any, index: number) => {
+						return (
+							<Route 
+								key={index}
+								path={route.path} 
+								exact={route.exact}
+								render={(props: RouteComponentProps<any>) => (
+									<route.component
+										name={route.name}
+										{...props}
+										{...route.props}
+									/>
+								)} />
+						)
+					})}
+				</Switch>
+			</div>
+		</Router>
 	);
 }
 
